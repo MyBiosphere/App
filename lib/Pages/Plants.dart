@@ -37,11 +37,6 @@ Future<List> sortPlantsList(List userPlantList) async {
     if(sortedPlants.containsKey(userPlantList[i].room)){
       sortedPlants[userPlantList[i].room]["plants"].add(
           userPlantList[i]
-        // {
-        //   "name":userPlantList[i].name,
-        //   "desc":userPlantList[i].desc,
-        //   "id":userPlantList[i].id,
-        // }
       );
     }
     else {
@@ -49,11 +44,6 @@ Future<List> sortPlantsList(List userPlantList) async {
         "name": userPlantList[i].room,
         "plants": [
           userPlantList[i]
-          // {
-          // "name":userPlantList[i].name,
-          // "desc":userPlantList[i].desc,
-          // "id":userPlantList[i].id,
-          // }
         ],
       };
     }

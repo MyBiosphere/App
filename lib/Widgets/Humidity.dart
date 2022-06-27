@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class Humidity extends StatelessWidget {
-  const Humidity({Key? key}) : super(key: key);
+  String humidity;
+  Color statusColor;
+
+  Humidity(this.humidity, this.statusColor, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -9,9 +12,9 @@ class Humidity extends StatelessWidget {
         margin: const EdgeInsets.only(
             left: 20.0, right: 20.0, top: 20.0, bottom: 20.0),
         padding: const EdgeInsets.all(20.0 / 2),
-        decoration: const BoxDecoration(
-            color: Color(0xFF9B2323),
-            borderRadius: BorderRadius.all(Radius.circular(20))),
+        decoration: BoxDecoration(
+            color: statusColor,
+            borderRadius: const BorderRadius.all(Radius.circular(20))),
         child: Column(
           children: [
             const Expanded(
@@ -28,14 +31,14 @@ class Humidity extends StatelessWidget {
                   )),
             ),
             Expanded(
-                flex: 5,
+                flex: 2,
                 child: Container(
                   padding: const EdgeInsets.all(20.0 / 1.5),
-                  child: const FittedBox(
+                  child: FittedBox(
                       fit: BoxFit.contain,
                       child: Text(
-                        "21%",
-                        style: TextStyle(
+                        humidity + "%",
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),

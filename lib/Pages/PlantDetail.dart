@@ -24,7 +24,7 @@ class _PlantDetail extends State<PlantDetail> {
   Map navigationBarData = {};
   Map userData = {};
   late Plant plantDetail;
-
+  late Color backgroundColor;
   File? picture;
 
   Future takePicture() async {
@@ -42,7 +42,7 @@ class _PlantDetail extends State<PlantDetail> {
     buttonStatus = arguments["navigationBarData"];
     userData = arguments["userData"];
     plantDetail = arguments["plantDetail"];
-
+    backgroundColor = plantDetail.status == "Saine" ? Colors.green : Colors.red;
     List data = [
       {
         "text": "Arrosage",
@@ -74,7 +74,7 @@ class _PlantDetail extends State<PlantDetail> {
             Expanded(
                 flex: 7,
                 child: Container(
-                    decoration: const BoxDecoration(color: Color(0xFF4CAF50)))),
+                    decoration: BoxDecoration(color: backgroundColor))),
             Expanded(
                 flex: 3,
                 child: Row(

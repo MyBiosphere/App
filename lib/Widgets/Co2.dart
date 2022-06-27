@@ -27,7 +27,7 @@ class Co2 extends StatelessWidget {
                 annotations: <CircularChartAnnotation>[
               CircularChartAnnotation(
                   widget: Text(
-                      co2Data[0].yData.toString() + '%\n'+ co2Data[0].xData,
+                      co2Data[0].yData.toStringAsFixed(1) + '%\n'+ co2Data[0].xData,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 38,

@@ -11,7 +11,7 @@ Future<void> main() async {
     initialRoute: '/loader',
     routes: {
       "/loader": (context) => Loader(),
-      "/dashboard": (context) => const Dashboard(),
+      "/dashboard": (context) => Dashboard(ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
       "/tasks": (context) => Tasks(ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
       "/plants": (context) => Plants(ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
       "/plantDetail": (context) => const PlantDetail(),
