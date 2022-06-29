@@ -7,6 +7,8 @@ import 'package:my_biosphere_app/Pages/PlantDetail.dart';
 import 'package:my_biosphere_app/Pages/Addplant.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(MaterialApp(
     initialRoute: '/loader',
     routes: {

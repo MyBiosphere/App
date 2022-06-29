@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -7,6 +10,8 @@ import 'package:my_biosphere_app/Datamodels/Co2Data.dart';
 import 'package:my_biosphere_app/Widgets/Temperature.dart';
 import 'package:my_biosphere_app/Widgets/Humidity.dart';
 import 'package:my_biosphere_app/Widgets/NavBar.dart' as NavBar;
+
+import '../Methods/notificationDefaultSound.dart';
 
 class Dashboard extends StatefulWidget {
   final Map<String, dynamic>? args;
@@ -36,11 +41,43 @@ Future<Map> fetchMetrics(token) async {
 class _Dashboard extends State<Dashboard> {
   late Map metrics = {};
   bool isLoading = true;
+  late Timer timer;
+  Map notification = {
+    "co2" : {
+      "title" : "Trop de co2 dans l'air",
+      "desc": "Il faut aérer l'appartement"
+    },
+    "humidity_low" : {
+      "title" : "L'air est trop sec",
+      "desc": "Il faut aérer l'appartement et ajouter des plantes"
+    },
+    "humidity_high" : {
+      "title" : "L'air est trop humide",
+      "desc": "Il faut aérer l'appartement"
+    },
+    "temperature_low" : {
+      "title" : "L'appartement est trop froid",
+      "desc": "Il faut fermer les fenêtres et allumer le chaufage"
+    },
+    "temperature_high" : {
+      "title" : "L'appartement est trop chaud",
+      "desc": "Il faut fermer les volets et les fenêtres"
+    },
+  };
+
+  FlutterLocalNotificationsPlugin flutterNotificationPlugin = FlutterLocalNotificationsPlugin();
 
   @override
   initState() {
     super.initState();
     getMetrics(widget.args!["userData"]["token"]);
+
+    var initializationSettingsAndroid = new AndroidInitializationSettings('app_icon');
+    var initializationSettingsIOS = new IOSInitializationSettings();
+    var initializationSettings = new InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    flutterNotificationPlugin.initialize(initializationSettings);
+
+    timer = Timer.periodic(const Duration(seconds: 10), (Timer t) => getMetrics(widget.args!["userData"]["token"]));
   }
 
   Future<void> getMetrics(token) async {
@@ -51,28 +88,35 @@ class _Dashboard extends State<Dashboard> {
     } else if(int.parse(metrics["co2"]) < 1000) {
       metrics["co2Color"] = palette["medium"];
     } else {
+      metrics["notification"] = notification["co2"];
       metrics["co2Color"] = palette["bad"];
     }
 
-    if(int.parse(metrics["temperature"]) < 25) {
+    if(int.parse(metrics["temperature"]) > 15 && int.parse(metrics["temperature"]) < 25 ) {
       metrics["temperatureColor"] = palette["good"];
     } else if(int.parse(metrics["temperature"]) < 35) {
       metrics["temperatureColor"] = palette["medium"];
     } else {
       metrics["temperatureColor"] = palette["bad"];
+      if (int.parse(metrics["temperature"]) < 15) {
+        metrics["notification"] = notification["temperature_low"];
+      }
+      else {
+        metrics["notification"] = notification["temperature_high"];
+      }
     }
 
-    if(int.parse(metrics["humidity"]) < 20 || int.parse(metrics["humidity"]) > 80) {
+    if(int.parse(metrics["humidity"]) < 20) {
+      metrics["notification"] = notification["humidity_low"];
+      metrics["humidityColor"] = palette["bad"];
+    } else if (int.parse(metrics["humidity"]) > 80) {
+      metrics["notification"] = notification["humidity_high"];
       metrics["humidityColor"] = palette["bad"];
     } else if(int.parse(metrics["humidity"]) < 40 || int.parse(metrics["humidity"]) > 70) {
       metrics["humidityColor"] = palette["medium"];
     } else {
-      metrics["humidityColor"] = palette["bad"];
+      metrics["humidityColor"] = palette["good"];
     }
-    // metrics["co2"] = [
-    //   (int.parse(metrics["co2"]) /82).toString(),
-    //   ((8200 - int.parse(metrics["co2"])) /82).toString(),
-    // ];
 
     co2Data.add(Co2Data('Co²', int.parse(metrics["co2"]) /82, const Color(0x8100DE27)));
     co2Data.add(Co2Data('air', (8200 - int.parse(metrics["co2"])) /82, const Color(
@@ -105,6 +149,11 @@ class _Dashboard extends State<Dashboard> {
     arguments = ModalRoute.of(context)?.settings.arguments as Map;
     buttonStatus = arguments["navigationBarData"];
     userData = arguments["userData"];
+
+    if (metrics.containsKey("notification") && !userData['notificationSent']){
+      notificationDefaultSound(flutterNotificationPlugin, metrics['notification']['title'], metrics['notification']['desc']);
+      userData['notificationSent'] = true;
+    }
 
 
     return Scaffold(
