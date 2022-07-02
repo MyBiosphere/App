@@ -24,6 +24,9 @@ Future<List<Plant>> fetchPlants(token) async {
 
   if (response.statusCode == 200) {
     List data = jsonDecode(utf8.decode(response.bodyBytes));
+    for( var i = 0 ; i < data.length; i++ ) {
+      print(data[i]);
+    }
     return Plant.userPlantList(data);
   }
   else {

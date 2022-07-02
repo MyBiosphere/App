@@ -3,18 +3,23 @@ class Task {
   final String name;
   final String desc;
   final bool done;
-  final String plant;
-  final String plantName;
-  final int plantId;
+  final bool plantRelated;
+  final String? plant;
+  final String? plantName;
+  final int? plantId;
+  final String? sensor;
 
-  const Task({
+
+  Task({
     required this.id,
     required this.name,
     required this.desc,
     required this.done,
-    required this.plant,
-    required this.plantName,
-    required this.plantId,
+    required this.plantRelated,
+    this.plant,
+    this.plantName,
+    this.plantId,
+    this.sensor,
   });
 
   factory Task.fromJson(Map<String, dynamic> json) {
@@ -23,9 +28,11 @@ class Task {
       name: json['name'],
       desc: json['description'],
       done: json['done'],
+      plantRelated: json['plant_related'],
       plant: json['plant'],
       plantName: json['plant_name'],
       plantId: json['plant_id'],
+      sensor: json['sensor'],
     );
   }
 

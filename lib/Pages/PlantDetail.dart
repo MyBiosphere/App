@@ -47,22 +47,22 @@ class _PlantDetail extends State<PlantDetail> {
       {
         "text": "Arrosage",
         "value": "${plantDetail.watering}/s",
-        "color": Color(0xDD0F08C9),
+        "color": Color(0xFF667BE1),
       },
       {
         "text": "Lumière",
         "value": plantDetail.sunshine,
-        "color": const Color(0xFFE1C014),
+        "color": const Color(0xFFF6F467),
       },
       {
         "text": "Rempotage",
         "value": "${plantDetail.repot}/an",
-        "color": const Color(0xFFA15810),
+        "color": const Color(0xFF9F7C58),
       },
       {
         "text": "Floraison",
         "value": plantDetail.bloom,
-        "color": const Color(0xFF9710A1),
+        "color": const Color(0xFFC9536E),
       },
     ];
 
@@ -73,8 +73,18 @@ class _PlantDetail extends State<PlantDetail> {
           Column(children: <Widget>[
             Expanded(
                 flex: 7,
-                child: Container(
-                    decoration: BoxDecoration(color: backgroundColor))),
+                child: plantDetail.pictureURL != null? Container(
+                    decoration: BoxDecoration(
+                      color: backgroundColor,
+                      image: DecorationImage(
+                        fit: BoxFit.fitHeight,
+                        image: NetworkImage(plantDetail.pictureURL!),
+
+                      ),
+                    )):Container(
+                    decoration: BoxDecoration(
+                      color: backgroundColor,
+                    ))),
             Expanded(
                 flex: 3,
                 child: Row(
@@ -119,15 +129,21 @@ class _PlantDetail extends State<PlantDetail> {
                     ),
                     Spacer(),
                     ElevatedButton(
+                      style: ButtonStyle(
+                          shape:
+                          MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ))),
                       onPressed: () {
                         // ScaffoldMessenger.of(context).showSnackBar(
                         //   const SnackBar(content: Text('Processing Data')),
                         // );
                         takePicture();
                       },
-                      child: const Text('Prendre une photo'),
+                      child: Text('Prendre une photo', overflow: TextOverflow.ellipsis,),
                     ),
-                    const SizedBox(width: 50),
+                    const SizedBox(width: 5),
                   ],
                 )),
             Expanded(

@@ -10,8 +10,8 @@ import 'package:my_biosphere_app/Datamodels/Co2Data.dart';
 import 'package:my_biosphere_app/Widgets/Temperature.dart';
 import 'package:my_biosphere_app/Widgets/Humidity.dart';
 import 'package:my_biosphere_app/Widgets/NavBar.dart' as NavBar;
-
-import '../Methods/notificationDefaultSound.dart';
+import 'package:my_biosphere_app/Methods/notificationDefaultSound.dart';
+import 'package:my_biosphere_app/Methods/TasksMethods.dart';
 
 class Dashboard extends StatefulWidget {
   final Map<String, dynamic>? args;
@@ -45,23 +45,28 @@ class _Dashboard extends State<Dashboard> {
   Map notification = {
     "co2" : {
       "title" : "Trop de co2 dans l'air",
-      "desc": "Il faut aérer l'appartement"
+      "desc": "Il faut aérer l'appartement",
+      "target": "Co2"
     },
     "humidity_low" : {
       "title" : "L'air est trop sec",
-      "desc": "Il faut aérer l'appartement et ajouter des plantes"
+      "desc": "Il faut aérer l'appartement et ajouter des plantes",
+      "target": "Humidité"
     },
     "humidity_high" : {
       "title" : "L'air est trop humide",
-      "desc": "Il faut aérer l'appartement"
+      "desc": "Il faut aérer l'appartement",
+      "target": "Humidité"
     },
     "temperature_low" : {
       "title" : "L'appartement est trop froid",
-      "desc": "Il faut fermer les fenêtres et allumer le chaufage"
+      "desc": "Il faut fermer les fenêtres et allumer le chaufage",
+      "target": "Température"
     },
     "temperature_high" : {
       "title" : "L'appartement est trop chaud",
-      "desc": "Il faut fermer les volets et les fenêtres"
+      "desc": "Il faut fermer les volets et les fenêtres",
+      "target": "Température"
     },
   };
 
@@ -77,7 +82,7 @@ class _Dashboard extends State<Dashboard> {
     var initializationSettings = new InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     flutterNotificationPlugin.initialize(initializationSettings);
 
-    timer = Timer.periodic(const Duration(seconds: 10), (Timer t) => getMetrics(widget.args!["userData"]["token"]));
+    // timer = Timer.periodic(const Duration(seconds: 10), (Timer t) => getMetrics(widget.args!["userData"]["token"]));
   }
 
   Future<void> getMetrics(token) async {
@@ -121,7 +126,6 @@ class _Dashboard extends State<Dashboard> {
     co2Data.add(Co2Data('Co²', int.parse(metrics["co2"]) /82, const Color(0x8100DE27)));
     co2Data.add(Co2Data('air', (8200 - int.parse(metrics["co2"])) /82, const Color(
         0xFFFFFFFF)));
-    print(metrics);
     setState(() {
       isLoading = false;
     });
@@ -149,9 +153,17 @@ class _Dashboard extends State<Dashboard> {
     arguments = ModalRoute.of(context)?.settings.arguments as Map;
     buttonStatus = arguments["navigationBarData"];
     userData = arguments["userData"];
-
     if (metrics.containsKey("notification") && !userData['notificationSent']){
       notificationDefaultSound(flutterNotificationPlugin, metrics['notification']['title'], metrics['notification']['desc']);
+      createTask(arguments["userData"]['token'],
+          {
+            'name': metrics['notification']['title'],
+            'description': metrics['notification']['desc'],
+            'done': false,
+            'user': userData['userURL'],
+            'plant_related': false,
+            'sensor': metrics['notification']['target']
+          });
       userData['notificationSent'] = true;
     }
 

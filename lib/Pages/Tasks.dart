@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:my_biosphere_app/Methods/TasksMethods.dart';
 import 'dart:convert';
 
 import 'package:my_biosphere_app/Widgets/NavBar.dart' as NavBar;
@@ -35,13 +36,16 @@ Future<Map> sortTasksList(List userTaskList) async {
     "todo": [],
     "done": []
   };
+
   for( var i = 0 ; i < userTaskList.length; i++ ) {
     if(userTaskList[i].done){
       sortedTasks["done"].add(
           {
             "name":userTaskList[i].name,
             "desc":userTaskList[i].desc,
-            "plant":userTaskList[i].plantName,
+            "target":userTaskList[i].plantRelated? userTaskList[i].plantName: userTaskList[i].sensor,
+            "id":userTaskList[i].id,
+            "plantRelated": userTaskList[i].plantRelated
           }
       );
     }
@@ -50,7 +54,9 @@ Future<Map> sortTasksList(List userTaskList) async {
           {
             "name":userTaskList[i].name,
             "desc":userTaskList[i].desc,
-            "plant":userTaskList[i].plantName,
+            "target":userTaskList[i].plantRelated? userTaskList[i].plantName: userTaskList[i].sensor,
+            "id":userTaskList[i].id,
+            "plantRelated": userTaskList[i].plantRelated
           }
       );
     }
@@ -94,7 +100,6 @@ class _Tasks extends State<Tasks> {
     buttonStatus = arguments["navigationBarData"];
     userData = arguments["userData"];
 
-
     return Scaffold(
         body: Column(children: <Widget>[
           Expanded(
@@ -124,23 +129,57 @@ class _Tasks extends State<Tasks> {
               child: ListView.builder(
                 itemBuilder: (BuildContext, index){
                   return Card(
-                    child: ListTile(
-                        leading: const CircleAvatar(),
-                        title: Text(tasksList["todo"][index]["name"]),
-                        subtitle: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    child: Row(
                           children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(tasksList["todo"][index]["plant"]),
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(tasksList["todo"][index]["desc"]),
-                            ),
+                            Expanded(flex: 8,child: ListTile(
+                                leading: ElevatedButton(
+                                  onPressed: () {},
+                                  child: Icon( //<-- SEE HERE
+                                    tasksList["todo"][index]["plantRelated"]? Icons.local_florist: Icons.air,
+                                    color: Colors.white,
+                                    size: 50,
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                      shape: const CircleBorder(),
+                                      padding: const EdgeInsets.all(5),
+                                      primary: tasksList["todo"][index]["plantRelated"]? Colors.green: Colors.blue,
+                                  ),
+                                ),
+                                title: Text(tasksList["todo"][index]["name"]),
+                                subtitle: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(tasksList["todo"][index]["target"]),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(tasksList["todo"][index]["desc"]),
+                                    ),
+                                  ],
+                                )
+                            ),),
+                            Expanded(flex: 1,child: IconButton(
+                              icon: const Icon(Icons.check_box_outline_blank),
+                              color: Colors.green,
+                              onPressed: () {
+                                setState(() {
+                                  updateTask(userData['token'],
+                                  {
+                                    'id':tasksList["todo"][index]["id"],
+                                    'done':true,
+                                  }
+                                  );
+                                  Navigator.of(context).pushNamed('/tasks', arguments: {
+                                    "navigationBarData": buttonStatus,
+                                    "userData": userData,
+                                  });
+                                });
+                              },
+                            ),)
                           ],
-                        )
-                    ),
+                        ),
                   );
                 },
                 itemCount: tasksList["todo"].length,
@@ -151,7 +190,6 @@ class _Tasks extends State<Tasks> {
           ),
           Expanded(
             flex: 2,
-            child: SafeArea(
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Container(
@@ -170,28 +208,48 @@ class _Tasks extends State<Tasks> {
                 ),
               ),
             ),
-          ),
           Expanded(
               flex: 3,
               child: ListView.builder(
                 itemBuilder: (BuildContext, index){
                   return Card(
-                    child: ListTile(
-                        leading: const CircleAvatar(),
-                        title: Text(tasksList["done"][index]["name"]),
-                        subtitle: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(tasksList["done"][index]["plant"]),
+                    child: Row(
+                      children: [
+                        Expanded(flex: 8,child: ListTile(
+                            leading: ElevatedButton(
+                              onPressed: () {},
+                              child: Icon( //<-- SEE HERE
+                                tasksList["done"][index]["plantRelated"]? Icons.local_florist: Icons.air,
+                                color: Colors.white,
+                                size: 50,
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                shape: const CircleBorder(),
+                                padding: const EdgeInsets.all(5),
+                                primary: tasksList["done"][index]["plantRelated"]? Colors.green: Colors.blue,
+                              ),
                             ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(tasksList["done"][index]["desc"]),
-                            ),
-                          ],
-                        )
+                            title: Text(tasksList["done"][index]["name"]),
+                            subtitle: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(tasksList["done"][index]["target"]),
+                                ),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(tasksList["done"][index]["desc"]),
+                                ),
+                              ],
+                            )
+                        ),),
+                        Expanded(flex: 1,child: IconButton(
+                          icon: const Icon(Icons.check_box),
+                          color: Colors.green,
+                          onPressed: () {},
+                        ),)
+                      ],
                     ),
                   );
                 },

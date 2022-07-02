@@ -24,7 +24,7 @@ class PlantDetailTile extends StatelessWidget {
                     child: Text(
                       detailData["text"],
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.left,
@@ -39,7 +39,7 @@ class PlantDetailTile extends StatelessWidget {
                     child: Text(
                       detailData["value"],
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.left,

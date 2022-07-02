@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:my_biosphere_app/Methods/notificationDefaultSound.dart';
 
 class Loader extends StatefulWidget {
-
   @override
   _Loader createState() => _Loader();
 }
@@ -23,57 +21,138 @@ class _Loader extends State<Loader> {
     'notificationSent': false
   };
 
-  FlutterLocalNotificationsPlugin flutterNotificationPlugin = FlutterLocalNotificationsPlugin();
+  final formKey = GlobalKey<FormState>();
+  String name = '';
+  String pwd = '';
+
+  FlutterLocalNotificationsPlugin flutterNotificationPlugin =
+      FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
-
-    var initializationSettingsAndroid = new AndroidInitializationSettings('app_icon');
+    var initializationSettingsAndroid =
+        new AndroidInitializationSettings('app_icon');
 
     var initializationSettingsIOS = new IOSInitializationSettings();
 
-    var initializationSettings = new InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    var initializationSettings = new InitializationSettings(
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
 
     flutterNotificationPlugin.initialize(initializationSettings);
-
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-        body: Column(children: <Widget>[
-          const Expanded(
-            flex: 1,
-              child:Text("Loading"),
+        body: SafeArea(
+      child: Column(
+        children: [
+        Expanded(flex: 4,
+          child:Align(
+          alignment: Alignment.center,
+          child: Container(
+            margin: const EdgeInsets.only(
+                left: 15.0, right: 15.0, top: 30.0, bottom: 15.0),
+            child: Text(
+              "Ma Biosphère",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize:
+                DefaultTextStyle.of(context).style.fontSize! / 1,
+              ),
+              textAlign: TextAlign.left,
+            ),
           ),
-          Expanded(
-              flex: 1,
-              child:TextButton(
-                child: const Text("Connexion",
-                  textAlign: TextAlign.center,),
-                onPressed: () {
-                  setState(() {
-                    buttonStatus.forEach((key, value) {
-                      buttonStatus[key] = Colors.white;
-                    });
-                    buttonStatus['dashboard'] = const Color(0xFF25832B);
-                    Navigator.of(context).pushNamed('/dashboard', arguments: {
-                      "navigationBarData": buttonStatus,
-                      "userData": userData,
-                    });
-                  });
-                },
-              )
-          ),
-          Expanded(
-              flex: 1,
-              child:TextButton(
-                child: const Text("Notification",
-                  textAlign: TextAlign.center,),
-                onPressed: () => notificationDefaultSound(flutterNotificationPlugin, 'Test', 'How to show Local Notification')
-              )
-              )
-        ]));
+        ),),
+          Expanded(flex: 8, child: Form(
+            key: formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Padding(
+              // padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Column(
+                // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    buildName(),
+                    buildPwd(),
+                    Container(
+                      height: 50,
+                      width: 200,
+                      decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(50)),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                            shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                ))),
+                        onPressed: () {
+                          setState(() {
+                            buttonStatus.forEach((key, value) {
+                              buttonStatus[key] = Colors.white;
+                            });
+                            buttonStatus['dashboard'] = const Color(0xFF25832B);
+                            Navigator.of(context)
+                                .pushNamed('/dashboard', arguments: {
+                              "navigationBarData": buttonStatus,
+                              "userData": userData,
+                            });
+                          });
+                        },
+                        child: Text(
+                          'Connexion',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize:
+                            DefaultTextStyle.of(context).style.fontSize! / 1.7,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ]),
+            ),
+          ),)
+        ],
+      )
+    ));
   }
+
+  Widget buildName() => TextFormField(
+        decoration: const InputDecoration(
+          labelText: 'Email',
+          border: OutlineInputBorder(),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Entrer votre identifiant';
+          } else {
+            return null;
+          }
+        },
+        onChanged: (String? value) {
+          name = value!;
+        },
+        maxLength: 80,
+      );
+
+  Widget buildPwd() => TextFormField(
+        decoration: const InputDecoration(
+          labelText: 'Mot de passe',
+          border: OutlineInputBorder(),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Entrez votre mot de passe';
+          } else {
+            return null;
+          }
+        },
+        onChanged: (String? value) {
+          pwd = value!;
+        },
+        maxLength: 200,
+      );
 }

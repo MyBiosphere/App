@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 
@@ -70,18 +71,20 @@ class _AddPlant extends State<AddPlant> {
     var request = http.MultipartRequest(
         'POST', Uri.parse('https://my-biosphere.herokuapp.com/plants/'));
     request.headers.addAll({
-      "Authorization": token
+      "Authorization": token,
     });
 
-    // CAS 1
     http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
-        'file', picture.path);
+        'picture', picture.path, contentType: MediaType('image', 'jpeg'));
+    await Future.delayed(Duration(seconds: 5));
     request.files.add(multipartFile);
 
-    // CAS 2
-    request.files.add(http.MultipartFile(
-        'name', picture.readAsBytes().asStream(), picture.lengthSync(),
-        filename: "test"));
+    // http.MultipartFile multipartFile =  http.MultipartFile(
+    //     'file',
+    //     picture.readAsBytes().asStream(),
+    //     picture.lengthSync(),
+    //     filename: "test");
+    // request.files.add(multipartFile);
 
     request.fields['name'] = name;
     request.fields['description'] = description;
@@ -111,42 +114,42 @@ class _AddPlant extends State<AddPlant> {
     }
   }
 
-  Future<String> createPlantWithoutPic(token) async {
-    final response =
-        await http.post(Uri.parse('https://my-biosphere.herokuapp.com/plants/'),
-            headers: {
-              'Content-Type': 'application/json; charset=UTF-8',
-              "Authorization": token,
-            },
-            body: jsonEncode(<String, dynamic>{
-              'name': name,
-              'description': description,
-              'room': room,
-              'status': status,
-              'watering': int.parse(watering),
-              'sunshine': sunshine,
-              'repot': int.parse(repot),
-              'blooming_time': blooming,
-              'user': user,
-            }));
-
-    if (response.statusCode == 201) {
-      setState(() {
-        // buttonStatus.forEach((key, value) {
-        //   buttonStatus[key] = Colors.white;
-        // });
-        // buttonStatus['plants'] = const Color(0xFF25832B);
-        Navigator.of(context).pushNamed('/plants', arguments: {
-          "navigationBarData": buttonStatus,
-          "userData": userData,
-        });
-      });
-      return "Sucess";
-    } else {
-      throw Exception(
-          'Plant creation failed : ' + response.statusCode.toString());
-    }
-  }
+  // Future<String> createPlantWithoutPic(token) async {
+  //   final response =
+  //       await http.post(Uri.parse('https://my-biosphere.herokuapp.com/plants/'),
+  //           headers: {
+  //             'Content-Type': 'application/json; charset=UTF-8',
+  //             "Authorization": token,
+  //           },
+  //           body: jsonEncode(<String, dynamic>{
+  //             'name': name,
+  //             'description': description,
+  //             'room': room,
+  //             'status': status,
+  //             'watering': int.parse(watering),
+  //             'sunshine': sunshine,
+  //             'repot': int.parse(repot),
+  //             'blooming_time': blooming,
+  //             'user': user,
+  //           }));
+  //
+  //   if (response.statusCode == 201) {
+  //     setState(() {
+  //       // buttonStatus.forEach((key, value) {
+  //       //   buttonStatus[key] = Colors.white;
+  //       // });
+  //       // buttonStatus['plants'] = const Color(0xFF25832B);
+  //       Navigator.of(context).pushNamed('/plants', arguments: {
+  //         "navigationBarData": buttonStatus,
+  //         "userData": userData,
+  //       });
+  //     });
+  //     return "Sucess";
+  //   } else {
+  //     throw Exception(
+  //         'Plant creation failed : ' + response.statusCode.toString());
+  //   }
+  // }
 
   Future takePicture() async {
     final pic = await ImagePicker().pickImage(source: ImageSource.camera);

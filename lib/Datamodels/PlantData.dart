@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Plant {
   final int id;
   final String name;
@@ -9,6 +11,8 @@ class Plant {
   final String repot;
   final String bloom;
   final String user;
+  final String? pictureURL;
+
 
   const Plant({
     required this.id,
@@ -21,6 +25,7 @@ class Plant {
     required this.repot,
     required this.bloom,
     required this.user,
+    this.pictureURL,
   });
 
   factory Plant.fromJson(Map<String, dynamic> json) {
@@ -35,6 +40,7 @@ class Plant {
       repot: json['repot'],
       bloom: json['blooming_time'],
       user: json['user'],
+      pictureURL: json['picture'],
     );
   }
 
